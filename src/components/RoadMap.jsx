@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, Send, Loader, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, Send, Loader, CheckCircle2, Clock, Target, TrendingUp, BookOpen, Users, Calendar, Star, Award } from 'lucide-react';
+import RoadmapGenerator from './RoadmapGenerator';
+
+// WARNING: Never expose API keys in production frontend code. Use a backend proxy for real apps.
+const GEMINI_API_KEY = 'AIzaSyBT5v5y4ehfGbyg4q1Us4WG3ZZP7boeuBc';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro-latest:generateContent';
 
 const RoadMap = () => {
   // States for Task Management
@@ -13,6 +18,16 @@ const RoadMap = () => {
   const [prompt, setPrompt] = useState('');
   const [roadmap, setRoadmap] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // States for additional features
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [studyStats, setStudyStats] = useState({
+    totalHours: 156,
+    weeklyGoal: 20,
+    currentWeek: 18,
+    streak: 7
+  });
 
   // Timer logic
   useEffect(() => {
@@ -69,159 +84,293 @@ const RoadMap = () => {
   // Progress calculation
   const progress = (tasks.filter(task => task.completed).length / tasks.length) * 100 || 0;
 
-  // Generate AI Roadmap
-  const generateRoadmap = async () => {
-    setLoading(true);
-    // Simulating API call to AI service
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // Mock AI-generated roadmap
-    const mockRoadmap = {
-      title: "Learn React Development",
-      steps: [
-        { name: "HTML & CSS Basics", duration: "2 weeks", details: "Learn the fundamentals of web structure and styling." },
-        { name: "JavaScript Fundamentals", duration: "4 weeks", details: "Master core JS concepts like variables, functions, and DOM manipulation." },
-        { name: "React Core Concepts", duration: "3 weeks", details: "Understand components, props, and state management in React." },
-        { name: "State Management (Redux)", duration: "2 weeks", details: "Learn global state management with Redux." },
-        { name: "React Hooks", duration: "2 weeks", details: "Explore functional components and built-in React hooks." },
-        { name: "Building a Project", duration: "4 weeks", details: "Apply your skills to create a full-fledged React application." }
-      ]
-    };
-
-    setRoadmap(mockRoadmap);
-    setLoading(false);
-  };
-
   // Timeline component for AI Roadmap
   const Timeline = ({ steps }) => (
-    <div className="relative border-l-2 border-gray-200 ml-4 mt-4">
+    <div className="relative border-l-2 border-primary-200 ml-4 mt-4">
       {steps.map((step, index) => (
         <div key={index} className="mb-10 ml-6">
-          <div className="absolute w-6 h-6 bg-white rounded-full -left-3 border border-blue-500 flex items-center justify-center">
-            <CheckCircle2 className="h-4 w-4 text-blue-500" />
+          <div className="absolute w-6 h-6 bg-white rounded-full -left-3 border-2 border-primary-500 flex items-center justify-center">
+            <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
           </div>
-          <div className="ml-4">
-            <h3 className="text-lg font-semibold">{step.name}</h3>
-            <time className="mb-1 text-sm font-normal leading-none text-gray-400">{step.duration}</time>
-            <p className="mb-4 text-base font-normal text-gray-500">{step.details}</p>
+          <div className="bg-white p-4 rounded-lg border border-light shadow-sm">
+            <h3 className="font-semibold text-primary mb-2">{step.name}</h3>
+            <p className="text-sm text-secondary mb-2">{step.details}</p>
+            <span className="inline-block bg-primary-100 text-primary-700 text-xs px-2 py-1 rounded-full">
+              {step.duration}
+            </span>
           </div>
         </div>
       ))}
     </div>
   );
 
+  // Study Stats Card
+  const StudyStatsCard = ({ icon, title, value, subtitle, color }) => (
+    <div className="card p-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-secondary font-medium">{title}</p>
+          <p className="text-2xl font-bold text-primary">{value}</p>
+          <p className="text-xs text-tertiary">{subtitle}</p>
+        </div>
+        <div className={`p-3 rounded-full ${color}`}>
+          {icon}
+        </div>
+      </div>
+    </div>
+  );
+
+  // Quick Actions
+  const QuickAction = ({ icon, title, description, onClick }) => (
+    <button 
+      onClick={onClick}
+      className="card p-4 text-left hover:scale-105 transition-transform cursor-pointer w-full"
+    >
+      <div className="flex items-center space-x-3">
+        <div className="p-2 bg-primary-100 rounded-lg">
+          {icon}
+        </div>
+        <div>
+          <h3 className="font-semibold text-primary">{title}</h3>
+          <p className="text-sm text-secondary">{description}</p>
+        </div>
+      </div>
+    </button>
+  );
+
+  // Popular Roadmaps
+  const popularRoadmaps = [
+    { title: "Web Development", icon: <BookOpen size={20} />, students: 1240, rating: 4.8 },
+    { title: "Data Science", icon: <TrendingUp size={20} />, students: 890, rating: 4.9 },
+    { title: "Mobile Development", icon: <Users size={20} />, students: 756, rating: 4.7 },
+    { title: "Machine Learning", icon: <Target size={20} />, students: 634, rating: 4.6 }
+  ];
+
   return (
-    <div className="p-4 w-[70rem] rounded-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-white">Study Roadmap</h1>
+    <div className="min-h-screen bg-secondary p-4 md:p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl md:text-4xl font-bold text-primary text-display">Roadmap Creator</h1>
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-secondary">Last updated:</span>
+            <span className="text-sm text-primary font-medium">Today</span>
+          </div>
+        </div>
 
-      {/* Add New Task */}
-      <div className="mb-4 border p-4 rounded shadow bg-white">
-        <h2 className="text-xl font-semibold">Add New Task</h2>
-        <div className="flex space-x-2 mt-2">
-          <input
-            type="text"
-            value={newTask}
-            onChange={(e) => setNewTask(e.target.value)}
-            placeholder="Enter a new task"
-            className="flex-grow border p-2 rounded"
+        {/* Study Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <StudyStatsCard 
+            icon={<Clock className="w-6 h-6 text-primary-600" />}
+            title="Total Study Hours"
+            value={studyStats.totalHours}
+            subtitle="This month"
+            color="bg-primary-100"
           />
-          <button onClick={addTask} className="bg-blue-500 text-white px-4 py-2 rounded">
-            Add
-          </button>
+          <StudyStatsCard 
+            icon={<Target className="w-6 h-6 text-success-600" />}
+            title="Weekly Goal"
+            value={`${studyStats.currentWeek}/${studyStats.weeklyGoal}h`}
+            subtitle="Hours completed"
+            color="bg-success-100"
+          />
+          <StudyStatsCard 
+            icon={<TrendingUp className="w-6 h-6 text-secondary-600" />}
+            title="Study Streak"
+            value={studyStats.streak}
+            subtitle="Days in a row"
+            color="bg-secondary-100"
+          />
+          <StudyStatsCard 
+            icon={<Award className="w-6 h-6 text-warning-600" />}
+            title="Achievements"
+            value="12"
+            subtitle="Badges earned"
+            color="bg-warning-100"
+          />
         </div>
-      </div>
-
-      {/* Tasks */}
-      <div className="mb-4 border p-4 rounded shadow bg-white">
-        <h2 className="text-xl font-semibold">Tasks</h2>
-        <ul className="space-y-2 mt-2">
-          {tasks.map(task => (
-            <li key={task.id} className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={task.completed}
-                onChange={() => toggleTask(task.id)}
-                className="form-checkbox h-5 w-5"
-              />
-              <span className={task.completed ? 'line-through' : ''}>{task.text}</span>
-            </li>
-          ))}
-        </ul>
-        <div className="mt-4 bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-blue-500 h-2 rounded-full"
-            style={{ width: `${progress}%` }}
-          ></div>
-        </div>
-      </div>
-
-      {/* Pomodoro Timer */}
-      <div className="border p-4 rounded shadow mb-4 bg-white">
-        <h2 className="text-xl font-semibold">Timer</h2>
         
-        {/* Input for user to set custom time */}
-        <div className="flex items-center justify-center space-x-2 mb-4">
-          <label htmlFor="timeInput" className="mr-2">Set Time (minutes):</label>
-          <input
-            id="timeInput"
-            type="number"
-            min="1"
-            value={inputMinutes}
-            onChange={(e) => setInputMinutes(Number(e.target.value))}
-            className="border p-2 rounded w-20 text-center"
-          />
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Task Management Section */}
+          <div className="card p-4 md:p-6">
+            <h2 className="text-xl font-bold mb-4 text-primary">Task Management</h2>
+            
+            {/* Add Task */}
+            <div className="flex gap-2 mb-4">
+              <input
+                type="text"
+                value={newTask}
+                onChange={(e) => setNewTask(e.target.value)}
+                placeholder="Add a new task..."
+                className="flex-1 p-3 border border-light rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none"
+                onKeyPress={(e) => e.key === 'Enter' && addTask()}
+              />
+              <button
+                onClick={addTask}
+                className="btn btn-primary px-4"
+              >
+                Add
+              </button>
+            </div>
 
-        <div className="text-4xl font-bold text-center mb-4">
-          {formatTime(timer)}
-        </div>
-        <div className="flex justify-center space-x-2">
-          <button onClick={startTimer} disabled={isActive} className="bg-green-500 text-white px-4 py-2 rounded">
-            Start
-          </button>
-          <button onClick={resetTimer} className="bg-red-500 text-white px-4 py-2 rounded">
-            Reset
-          </button>
-        </div>
-      </div>
+            {/* Task List */}
+            <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
+              {tasks.map((task) => (
+                <div
+                  key={task.id}
+                  className="flex items-center p-3 bg-secondary rounded-lg border border-light"
+                >
+                  <input
+                    type="checkbox"
+                    checked={task.completed}
+                    onChange={() => toggleTask(task.id)}
+                    className="mr-3 text-primary-600 border-light rounded focus:ring-primary-500"
+                  />
+                  <span className={`flex-1 ${task.completed ? 'line-through text-tertiary' : 'text-primary'}`}>
+                    {task.text}
+                  </span>
+                </div>
+              ))}
+            </div>
 
-      {/* Alert if all tasks are completed */}
-      {tasks.length > 0 && progress === 100 && (
-        <div className="mt-4 border p-4 rounded shadow bg-green-100 text-green-800 flex items-center">
-          <AlertCircle className="h-4 w-4 mr-2" />
-          <div>
-            <h3 className="font-bold">Congratulations!</h3>
-            <p>You've completed all your tasks. Great job!</p>
+            {/* Progress Bar */}
+            <div className="mb-4">
+              <div className="flex justify-between text-sm text-secondary mb-1">
+                <span>Progress</span>
+                <span>{Math.round(progress)}%</span>
+              </div>
+              <div className="w-full bg-tertiary rounded-full h-2">
+                <div
+                  className="bg-gradient-to-r from-primary-500 to-secondary-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Pomodoro Timer Section */}
+          <div className="card p-4 md:p-6">
+            <h2 className="text-xl font-bold mb-4 text-primary">Pomodoro Timer</h2>
+            
+            <div className="text-center mb-6">
+              <div className="text-4xl md:text-6xl font-bold text-primary mb-4">
+                {formatTime(timer)}
+              </div>
+              
+              <div className="flex gap-2 mb-4 justify-center">
+                <input
+                  type="number"
+                  value={inputMinutes}
+                  onChange={(e) => setInputMinutes(parseInt(e.target.value) || 0)}
+                  min="1"
+                  max="120"
+                  className="w-20 p-2 border border-light rounded-lg text-center focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none"
+                />
+                <span className="flex items-center text-secondary">minutes</span>
+              </div>
+              
+              <div className="flex gap-2 justify-center">
+                <button
+                  onClick={startTimer}
+                  disabled={isActive}
+                  className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isActive ? <Loader className="w-4 h-4 animate-spin" /> : 'Start'}
+                </button>
+                <button
+                  onClick={resetTimer}
+                  className="btn btn-secondary"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Timer Presets */}
+            <div className="grid grid-cols-3 gap-2">
+              <button 
+                onClick={() => setInputMinutes(25)}
+                className="p-2 text-xs bg-secondary rounded-lg hover:bg-primary-100 transition-colors"
+              >
+                25 min
+              </button>
+              <button 
+                onClick={() => setInputMinutes(45)}
+                className="p-2 text-xs bg-secondary rounded-lg hover:bg-primary-100 transition-colors"
+              >
+                45 min
+              </button>
+              <button 
+                onClick={() => setInputMinutes(60)}
+                className="p-2 text-xs bg-secondary rounded-lg hover:bg-primary-100 transition-colors"
+              >
+                60 min
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold text-primary">Quick Actions</h2>
+            <QuickAction 
+              icon={<BookOpen className="w-5 h-5 text-primary-600" />}
+              title="Create New Roadmap"
+              description="Start a custom learning path"
+              onClick={() => console.log('Create roadmap')}
+            />
+            <QuickAction 
+              icon={<Users className="w-5 h-5 text-secondary-600" />}
+              title="Join Study Group"
+              description="Connect with other learners"
+              onClick={() => console.log('Join group')}
+            />
+            <QuickAction 
+              icon={<Calendar className="w-5 h-5 text-success-600" />}
+              title="Schedule Session"
+              description="Plan your study time"
+              onClick={() => console.log('Schedule session')}
+            />
+            <QuickAction 
+              icon={<Star className="w-5 h-5 text-warning-600" />}
+              title="View Achievements"
+              description="Check your progress badges"
+              onClick={() => console.log('View achievements')}
+            />
           </div>
         </div>
-      )}
 
-      {/* AI Roadmap Creator */}
-      <div className="bg-white shadow-md rounded-lg p-6 mt-6">
-        <h2 className="text-2xl font-semibold mb-4 ">AI Roadmap Creator</h2>
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="E.g., Create a roadmap for learning React development"
-          rows={4}
-          className="w-full p-2 border border-gray-300 rounded mb-4"
-        />
-        <button
-          onClick={generateRoadmap}
-          className="bg-blue-500 text-white px-4 py-2 rounded flex items-center justify-center"
-          disabled={loading}
-        >
-          {loading ? <Loader className="animate-spin h-5 w-5 mr-2" /> : <Send className="h-5 w-5 mr-2" />}
-          Generate Roadmap
-        </button>
-
-        {/* Displaying AI-generated roadmap */}
-        {roadmap && (
-          <div className="mt-4 border-t pt-4">
-            <h3 className="font-bold text-lg mb-2">{roadmap.title}</h3>
-            <Timeline steps={roadmap.steps} />
+        {/* Popular Roadmaps */}
+        <div className="card p-4 md:p-6 mb-8">
+          <h2 className="text-xl font-bold mb-4 text-primary">Popular Roadmaps</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {popularRoadmaps.map((roadmap, index) => (
+              <div key={index} className="card p-4 hover:scale-105 transition-transform cursor-pointer">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="p-2 bg-primary-100 rounded-lg">
+                    {roadmap.icon}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-primary">{roadmap.title}</h3>
+                    <div className="flex items-center space-x-2">
+                      <Star className="w-4 h-4 text-warning-500 fill-current" />
+                      <span className="text-sm text-secondary">{roadmap.rating}</span>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-sm text-secondary">{roadmap.students} students enrolled</p>
+                <button className="btn btn-outline w-full mt-3 text-sm">
+                  Start Learning
+                </button>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+
+        {/* AI Roadmap Creator (replaced with RoadmapGenerator) */}
+        <div className="mb-8">
+          <RoadmapGenerator />
+        </div>
+
+        {/* Generated Roadmap (handled by RoadmapGenerator now) */}
       </div>
     </div>
   );

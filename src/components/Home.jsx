@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, Trophy, Search, Plus, X, ChevronRight, Star, Users, BookOpen } from 'lucide-react';
-import '../App.css'
 
 const Home = () => {
   const [task, setTask] = useState('');
@@ -45,20 +44,21 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-color-[#A0D7E7] text-white p-8">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h1 className="text-5xl font-extrabold mb-4">Plan Your Study Roadmap</h1>
-          <p className="text-lg mb-8">
+        <div className="text-center max-w-3xl mx-auto mb-16 fade-in">
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-display text-primary">Plan Your Study Roadmap</h1>
+          <p className="text-base md:text-lg mb-8 text-secondary">
             Stay organized and achieve your academic goals with your personalized study roadmap.
             Get ready to ace your subjects with ease and fun!
           </p>
           <div className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-tertiary w-5 h-5" />
             <input 
               type="text" 
-              placeholder='Search' 
-              className='p-2 pl-10 ml-12 rounded-lg w-full '
+              placeholder='Search roadmaps, courses, or topics...' 
+              className='w-full p-3 md:p-4 pl-12 rounded-xl border-2 border-light focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all duration-200 bg-white shadow-md'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -67,7 +67,7 @@ const Home = () => {
 
         {/* Features Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <FeatureCard className='text-black'
+          <FeatureCard 
             icon={<Calendar size={32} />}
             title="Personalized Roadmaps"
             description="Create custom study plans based on your goals and deadlines."
@@ -85,19 +85,19 @@ const Home = () => {
         </div>
 
         {/* Call to Action and To-Do List Section */}
-        <div className="flex flex-col md:flex-row gap-12 mb-16">
+        <div className="flex flex-col lg:flex-row gap-12 mb-16">
           {/* Call to Action */}
-          <div className="text-center md:w-1/2">
-            <h2 className="text-3xl font-semibold mb-6">Ready to Crush Your Exams?</h2>
+          <div className="text-center lg:w-1/2">
+            <h2 className="text-3xl font-semibold mb-6 text-primary text-display">Ready to Crush Your Exams?</h2>
             <button 
-              className="bg-white text-purple-600 font-semibold py-2 px-6 rounded-full hover:bg-purple-200 transition"
+              className="btn btn-primary text-lg px-8 py-3 rounded-full hover:scale-105 transition-transform"
               onClick={() => setShowRoadmap(!showRoadmap)}
             >
               {showRoadmap ? 'Hide Roadmap Builder' : 'Start Building Your Roadmap'}
             </button>
             {showRoadmap && (
-              <div className="mt-6 bg-white text-purple-600 p-6 rounded-lg shadow-lg">
-                <h3 className="text-xl font-bold mb-4">Roadmap Builder</h3>
+              <div className="mt-6 card p-6 slide-in">
+                <h3 className="text-xl font-bold mb-4 text-primary">Roadmap Builder</h3>
                 {roadmapSteps.map((step, index) => (
                   <div key={index} className="flex gap-2 mb-2">
                     <input
@@ -105,19 +105,19 @@ const Home = () => {
                       placeholder="Step description"
                       value={step.text}
                       onChange={(e) => handleUpdateRoadmapStep(index, 'text', e.target.value)}
-                      className="flex-grow p-2 rounded-lg border border-purple-400"
+                      className="flex-grow p-2 rounded-lg border border-primary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none"
                     />
                     <input
                       type="text"
                       placeholder="Duration"
                       value={step.duration}
                       onChange={(e) => handleUpdateRoadmapStep(index, 'duration', e.target.value)}
-                      className="w-24 p-2 rounded-lg border border-purple-400"
+                      className="w-24 p-2 rounded-lg border border-primary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none"
                     />
                   </div>
                 ))}
                 <button
-                  className="mt-2 w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700"
+                  className="btn btn-secondary w-full mt-2"
                   onClick={handleAddRoadmapStep}
                 >
                   <Plus size={16} className="inline mr-2" /> Add Step
@@ -127,18 +127,18 @@ const Home = () => {
           </div>
 
           {/* To-Do List */}
-          <div className="bg-white text-black p-6 rounded-lg shadow-lg md:w-1/2">
-            <h3 className="text-xl font-bold mb-4">To-Do List</h3>
+          <div className="card p-6 lg:w-1/2">
+            <h3 className="text-xl font-bold mb-4 text-primary">To-Do List</h3>
             <div className="mb-4">
               <input
                 type="text"
-                className="p-2 rounded-lg border border-purple-400 w-full"
+                className="w-full p-3 rounded-lg border border-primary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none"
                 placeholder="Add a new task"
                 value={task}
                 onChange={(e) => setTask(e.target.value)}
               />
               <button
-                className="mt-2 w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700"
+                className="btn btn-primary w-full mt-2"
                 onClick={handleAddTask}
               >
                 <Plus size={16} className="inline mr-2" /> Add Task
@@ -148,19 +148,19 @@ const Home = () => {
               {tasks.map((task, index) => (
                 <li
                   key={index}
-                  className="flex justify-between items-center p-2 bg-purple-100 rounded-lg"
+                  className="flex justify-between items-center p-3 bg-secondary rounded-lg border border-light"
                 >
-                  <span className={task.completed ? 'line-through' : ''}>
+                  <span className={task.completed ? 'line-through text-tertiary' : 'text-primary'}>
                     <input
                       type="checkbox"
                       checked={task.completed}
                       onChange={() => handleToggleTask(index)}
-                      className="mr-2"
+                      className="mr-2 text-primary-600 border-light rounded focus:ring-primary-500"
                     />
                     {task.text}
                   </span>
                   <button
-                    className="text-red-500 hover:text-red-700"
+                    className="text-error-500 hover:text-error-600 transition-colors"
                     onClick={() => handleDeleteTask(index)}
                   >
                     <X size={16} />
@@ -172,74 +172,86 @@ const Home = () => {
         </div>
 
         {/* Existing Roadmaps Section */}
-        <div className="bg-white text-black p-6 rounded-lg shadow-lg mb-16">
-          <h3 className="text-2xl font-bold mb-6">Your Roadmaps</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold mb-8 text-center text-primary text-display">Your Active Roadmaps</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {existingRoadmaps.map((roadmap) => (
-              <div key={roadmap.id} className="bg-purple-100 p-4 rounded-lg">
-                <h4 className="text-lg font-semibold mb-2">{roadmap.title}</h4>
-                <div className="w-full bg-purple-200 rounded-full h-2.5">
-                  <div 
-                    className="bg-purple-600 h-2.5 rounded-full" 
-                    style={{width: `${roadmap.progress}%`}}
-                  ></div>
+              <div key={roadmap.id} className="card p-6 hover:scale-105 transition-transform">
+                <h3 className="text-lg font-semibold mb-3 text-primary">{roadmap.title}</h3>
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm text-secondary mb-1">
+                    <span>Progress</span>
+                    <span>{roadmap.progress}%</span>
+                  </div>
+                  <div className="w-full bg-tertiary rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-primary-500 to-accent-500 h-2 rounded-full transition-all duration-300" 
+                      style={{width: `${roadmap.progress}%`}}
+                    ></div>
+                  </div>
                 </div>
-                <p className="text-right mt-1">{roadmap.progress}% Complete</p>
+                <button className="btn btn-outline w-full">
+                  Continue Learning <ChevronRight size={16} className="ml-2" />
+                </button>
               </div>
             ))}
           </div>
-          <button className="mt-6 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition">
-            View All Roadmaps
-          </button>
         </div>
 
-        {/* Additional Homepage Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
-          {/* Testimonials Section */}
-          <div className="bg-white text-black p-6 rounded-lg shadow-lg">
-            <h3 className="text-2xl font-bold mb-6">What Our Users Say</h3>
-            <div className="space-y-4">
-              <Testimonial 
-                text="This roadmap planner has completely transformed my study habits!"
-                author="Raj Patle, Computer Science Student"
-              />
-              <Testimonial 
-                text="I love how easy it is to track my progress and stay motivated."
-                author="Harsh Bhole, Aspiring Web Developer"
-              />
-            </div>
+        {/* Testimonials Section */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold mb-8 text-center text-primary text-display">What Students Say</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Testimonial 
+              text="RouteCraft helped me organize my study schedule and stay on track with my goals. Highly recommended!"
+              author="Sarah Johnson"
+            />
+            <Testimonial 
+              text="The roadmap feature is amazing! I can see my progress and stay motivated throughout my learning journey."
+              author="Mike Chen"
+            />
+            <Testimonial 
+              text="Finally, a tool that makes studying fun and organized. My grades have improved significantly!"
+              author="Emily Rodriguez"
+            />
           </div>
+        </div>
 
-          {/* Resources Section */}
-          <div className="bg-white text-black p-6 rounded-lg shadow-lg">
-            <h3 className="text-2xl font-bold mb-6">Learning Resources</h3>
-            <ul className="space-y-2">
-              <Resource 
-                icon={<BookOpen size={20} />}
-                title="Free Programming Books"
-                link="#"
-              />
-              <Resource 
-                icon={<Users size={20} />}
-                title="Study Group Finder"
-                link="#"
-              />
-              <Resource 
-                icon={<Star size={20} />}
-                title="Top Rated Online Courses"
-                link="#"
-              />
-            </ul>
-          </div>
+        {/* Resources Section */}
+        <div className="card p-8 mb-16">
+          <h3 className="text-2xl font-bold mb-6 text-primary text-display">Learning Resources</h3>
+          <ul className="space-y-4">
+            <Resource 
+              icon={<BookOpen size={20} />}
+              title="Free Programming Books"
+              link="#"
+            />
+            <Resource 
+              icon={<Users size={20} />}
+              title="Study Group Finder"
+              link="#"
+            />
+            <Resource 
+              icon={<Star size={20} />}
+              title="Top Rated Online Courses"
+              link="#"
+            />
+          </ul>
         </div>
 
         {/* Call-to-Action Footer */}
-        <div className="text-center bg-[#046d82] p-8 rounded-lg shadow-lg">
-          <h2 className="text-3xl font-bold mb-4">Start Your Learning Journey Today!</h2>
-          <p className="mb-6">Join thousands of students achieving their goals with our roadmap planner.</p>
-          <button className="bg-white text-purple-600 font-semibold py-2 px-6 rounded-full hover:bg-purple-200 transition">
-            Sign Up Now
-          </button>
+        <div className="text-center card p-8 bg-gradient-to-r from-primary-500 to-accent-500 text-white relative overflow-hidden">
+          {/* Background overlay for better text visibility */}
+          <div className="absolute inset-0 bg-black/20"></div>
+          
+          {/* Content with relative positioning */}
+          <div className="relative z-10">
+            <h2 className="text-3xl font-bold mb-4 text-display text-white drop-shadow-lg">Start Your Learning Journey Today!</h2>
+            <p className="mb-6 text-white/90 text-lg drop-shadow-md">Join thousands of students achieving their goals with our roadmap planner.</p>
+            <button className="btn bg-white text-black font-bold py-3 px-8 rounded-full hover:bg-primary-50 transition-colors shadow-lg hover:shadow-xl transform hover:scale-105">
+              Sign Up Now
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -247,27 +259,31 @@ const Home = () => {
 };
 
 const FeatureCard = ({ icon, title, description }) => (
-  <div className="flex flex-col items-center text-center p-6 bg-white text-purple-600 rounded-lg shadow-lg text-black">
-    <div className="bg-purple-200 p-4 rounded-full mb-4">
-      {icon}
+  <div className="card p-6 text-center hover:scale-105 transition-transform">
+    <div className="bg-gradient-to-br from-primary-100 to-accent-100 p-4 rounded-full mb-4 inline-block">
+      <div className="text-primary-600">
+        {icon}
+      </div>
     </div>
-    <h3 className="text-xl font-bold mb-2">{title}</h3>
-    <p>{description}</p>
+    <h3 className="text-xl font-bold mb-2 text-primary">{title}</h3>
+    <p className="text-secondary">{description}</p>
   </div>
 );
 
 const Testimonial = ({ text, author }) => (
-  <div className="bg-purple-100 p-4 rounded-lg">
-    <p className="italic mb-2">"{text}"</p>
-    <p className="font-semibold">- {author}</p>
+  <div className="card p-6 bg-gradient-to-br from-primary-50 to-accent-50">
+    <p className="italic mb-4 text-secondary">"{text}"</p>
+    <p className="font-semibold text-primary">- {author}</p>
   </div>
 );
 
 const Resource = ({ icon, title, link }) => (
   <li>
-    <a href={link} className="flex items-center space-x-2 text-purple-600 hover:text-purple-800 transition">
-      {icon}
-      <span className='text-black'>{title}</span>
+    <a href={link} className="flex items-center space-x-3 text-primary-600 hover:text-primary-800 transition-colors p-3 rounded-lg hover:bg-primary-50">
+      <div className="text-primary-500">
+        {icon}
+      </div>
+      <span className="font-medium">{title}</span>
     </a>
   </li>
 );

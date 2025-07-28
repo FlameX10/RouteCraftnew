@@ -1,5 +1,6 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation , Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import Landing from './components/Landing';
 import Home from './components/Home';
 import Dashboard from './components/Dashboard';
 import Profile from './components/Profile';
@@ -7,35 +8,36 @@ import RoadMap from './components/RoadMap';
 import LeaderBoard from './components/Leaderboard';
 import Contact from './components/Contact';
 import Navbar from './components/Sidebar';
-import Login from './components/Login';
-import SignUp from './components/Signup';
 import AddFriend from './components/AddFriend';
-import  Group  from './components/Group';
-import logo from './assets/logo-color.png';
+import Group from './components/Group';
+import Login from './components/Login';
 import './App.css';
 
 function App() {
-  const location = useLocation(); // Get the current route
+  const location = useLocation();
+  // Hide sidebar/header on login and landing page
+  const hideSidebar = location.pathname === '/login' || location.pathname === '/';
+  const hideHeader = location.pathname === '/login' || location.pathname === '/';
 
-  // Check if the current route is either "/login" or "/signup"
-  const hideSidebar = location.pathname === '/Login' || location.pathname === '/SignUp';
+  useEffect(() => {
+    if (hideHeader) {
+      document.body.classList.add('auth-page');
+    } else {
+      document.body.classList.remove('auth-page');
+    }
+    return () => {
+      document.body.classList.remove('auth-page');
+    };
+  }, [hideHeader]);
 
   return (
     <>
-    <header className='h-16 bg-[#043039] text-white z-10 border-none fixed '>
-      <img src={logo} alt="logo" className='h-32 w-32 rounded-lg m-0'/>
-        <Link to='Login'>
-          <button className='text-white ml-[74rem]'>Login</button>
-        </Link>
-        <Link to='SignUp'>
-        <button className='text-white m-4'>SignUp</button>
-        </Link>
-    </header>
-      <div className="flex">
+      <div className={`flex ${hideHeader ? 'h-screen' : ''}`}>
         {!hideSidebar && <Navbar />}
-        <div className={`flex-grow p-4 ${!hideSidebar ? 'ml-[12rem] mt-12' : ''}`}> 
+        <main className={`flex-1 ${!hideSidebar ? 'ml-[280px]' : ''} ${hideHeader ? 'w-full' : ''} min-h-screen bg-secondary`}>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/home" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
@@ -43,11 +45,9 @@ function App() {
             <Route path="/group" element={<Group />} />
             <Route path="/leaderboard" element={<LeaderBoard />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/signup" element={<SignUp />} />
             <Route path="Group/AddFriend" element={<AddFriend />} />
-            <Route path="/login" element={<Login />} />
           </Routes>
-        </div>
+        </main>
       </div>
     </>
   );
